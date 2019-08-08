@@ -1,10 +1,12 @@
 package com.learning.project.model;
 
+import lombok.Data;
+
 /**
  * @author Youngz
  * @date 2019/8/5 - 23:11
  */
-
+@Data
 public class User {
     private Integer id;
     private String name;
@@ -12,6 +14,20 @@ public class User {
     private String token;
     private Long gmtCreate;
     private Long gmtModified;
+    private String avatarUrl;
+    ;
+
+  /*  public Long getGmtCreate() {
+        return gmtCreate;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
 
     public Integer getId() {
         return id;
@@ -45,9 +61,7 @@ public class User {
         this.token = token;
     }
 
-    public Long getGmtCreate(long l) {
-        return gmtCreate;
-    }
+
 
     public void setGmtCreate(Long gmtCreate) {
         this.gmtCreate = gmtCreate;
@@ -61,5 +75,5 @@ public class User {
         this.gmtModified = gmtModified;
     }
 
-
+*/
 }

@@ -39,6 +39,7 @@ public class AuthorizeController {
                            @RequestParam(name = "state") String state,
                            HttpServletResponse response) {
 
+
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         //github中自己创建的授权用户id，等信息
         accessTokenDTO.setClient_id(clientId);
@@ -50,14 +51,15 @@ public class AuthorizeController {
         GithubUser githubUser = gitHubProvider.getUser(accessToken);
       //业务逻辑，判断都再Controller
         //先登录，获取用户信息
-        if (githubUser != null) {
+        if (githubUser != null && githubUser.getId() !=null) {
             User user = new User();
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
             String token = UUID.randomUUID().toString();
             user.setToken(token);//以UUID形式
             user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate(0));
+            user.setGmtModified(user.getGmtCreate());
+            user.setAvatarUrl(githubUser.getAvatar_url());
             userMapper.insert(user);//存入数据库中
             //将token放入到cookie中
     response.addCookie(new Cookie("token",token));

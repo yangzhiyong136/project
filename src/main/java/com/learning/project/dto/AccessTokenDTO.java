@@ -1,17 +1,20 @@
 package com.learning.project.dto;
 
+import lombok.Data;
+
 /**
  * @author Youngz
  * @date 2019/8/3 - 22:14
  */
 //dto数据传输功能
+    @Data
 public class AccessTokenDTO {
     private String client_id;
     private String client_secret;
     private String code;
     private String redirect_uri;
     private String state;
-
+/*
     public String getClient_id() {
         return client_id;
     }
@@ -50,5 +53,5 @@ public class AccessTokenDTO {
 
     public void setState(String state) {
         this.state = state;
-    }
+    }*/
 }
