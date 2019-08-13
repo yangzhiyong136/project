@@ -17,6 +17,7 @@ public class Question {
     private Long gmtModified;
     private Integer creator;
     private Integer viewCount;
+    //开始存入数据是null，没有显示为0，去数据库手动改为0的，怎么不改数据库来实现呢？
     private Integer commentCount;
     private Integer likeCount;
 

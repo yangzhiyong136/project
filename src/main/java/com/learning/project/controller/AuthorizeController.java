@@ -2,9 +2,9 @@ package com.learning.project.controller;
 
 import com.learning.project.dto.AccessTokenDTO;
 import com.learning.project.dto.GithubUser;
-import com.learning.project.mapper.UserMapper;
 import com.learning.project.model.User;
 import com.learning.project.provider.GitHubProvider;
+import com.learning.project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -24,15 +24,15 @@ public class AuthorizeController {
     @Autowired
     private GitHubProvider gitHubProvider;
 
-    @Autowired
-    private UserMapper userMapper;//这种错误没问题
-
     @Value("${github.client.id}")//读取配置文件中的key,value
     private String clientId;
     @Value("${github.client.secret}")
     private String clientSecret;
     @Value("${github.redirect.uri}")
     private String redirectUri;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
@@ -49,20 +49,18 @@ public class AuthorizeController {
         accessTokenDTO.setState(state);
         String accessToken = gitHubProvider.getAccessToken(accessTokenDTO);
         GithubUser githubUser = gitHubProvider.getUser(accessToken);
-      //业务逻辑，判断都再Controller
+        //业务逻辑，判断都再Controller
         //先登录，获取用户信息
-        if (githubUser != null && githubUser.getId() !=null) {
+        if (githubUser != null && githubUser.getId() != null) {
             User user = new User();
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
             String token = UUID.randomUUID().toString();
             user.setToken(token);//以UUID形式
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
             user.setAvatarUrl(githubUser.getAvatar_url());
-            userMapper.insert(user);//存入数据库中
+            userService.createOrUpdate(user);
             //将token放入到cookie中
-    response.addCookie(new Cookie("token",token));
+            response.addCookie(new Cookie("token", token));//把封装好的对象，传到前端
             //redirect返回的是路径，所以是要"/"
             return "redirect:/";
         } else {

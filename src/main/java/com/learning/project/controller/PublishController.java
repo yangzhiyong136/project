@@ -1,7 +1,6 @@
 package com.learning.project.controller;
 
 import com.learning.project.mapper.QuestionMapper;
-import com.learning.project.mapper.UserMapper;
 import com.learning.project.model.Question;
 import com.learning.project.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -22,8 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 public class PublishController {
     @Autowired
     private QuestionMapper questionMapper;
-    @Autowired
-    private UserMapper userMapper;
+   /* @Autowired
+    private UserMapper userMapper;*/
 
     @GetMapping("/publish")
     public String publish() {
@@ -56,7 +54,7 @@ public class PublishController {
             model.addAttribute("error", "标签不能为空");
             return "publish";
         }
-        User user = null;
+       /* User user = null;
         Cookie[] cookies = request.getCookies();//获取cookie中的token，判断是否登录
         if (cookies != null && cookies.length != 0)
             for (Cookie cookie : cookies) {
@@ -64,15 +62,18 @@ public class PublishController {
                     String token = cookie.getValue();
                     user = userMapper.findByToken(token);//在数据库中寻找
                     if (user != null) {//获取用户信息不为空
-                        request.getSession().setAttribute("user", user);
+                        request.getSession().setAttribute("user", user);//把封装好的对象，传到前端
                     }
                     break;
                 }
-            }
+            }*/
+        User user = (User) request.getSession().getAttribute("user");
+
         if (user == null) {
-            model.addAttribute("error", "用户未登录");
+            model.addAttribute("error", "用户未登录");//把封装好的对象，传到前端
             return "publish";
         }
+
         Question question = new Question();
         question.setTag(tag);
         question.setTitle(title);
