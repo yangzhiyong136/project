@@ -2,6 +2,7 @@ package com.learning.project.interceptor;
 
 import com.learning.project.mapper.UserMapper;
 import com.learning.project.model.User;
+import com.learning.project.model.UserExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author Youngz
@@ -26,26 +28,31 @@ public class SessionInterceptor implements HandlerInterceptor {
    /* @Autowired
     private NotificationService notificationService;*/
 
-   // @Value("${github.redirect.uri}")
-  //  private String redirectUri;
+    // @Value("${github.redirect.uri}")
+    //  private String redirectUri;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //设置 context 级别的属性
-       // request.getServletContext().setAttribute("redirectUri", redirectUri);
-      //Cookie是会变的，注意！！！
+        // request.getServletContext().setAttribute("redirectUri", redirectUri);
+        //Cookie是会变的，注意！！！
         Cookie[] cookies = request.getCookies();//获取cookie中的token，判断是否登录
         if (cookies != null && cookies.length != 0)
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("token")) {
                     String token = cookie.getValue();
-                    User user = userMapper.findByToken(token);//在数据库中寻找
-                    if (user != null) {//获取用户信息不为空
+                    UserExample userExample = new UserExample();
+                    userExample.createCriteria().andTokenEqualTo(token);
+                    List<User> users = userMapper.selectByExample(userExample);
+                    //   User user = userMapper.findByToken(token);//在数据库中寻找
+                   /* if (user != null) {//获取用户信息不为空
                         request.getSession().setAttribute("user", user);//把封装好的对象，传到前端
+                    }*/
+                    if (users.size() != 0){
+                        request.getSession().setAttribute("user", users.get(0));//把封装好的对象，传到前端
                     }
-                    break;
+                        break;
                 }
-
             }
         /*Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length != 0)

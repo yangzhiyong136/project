@@ -5,7 +5,9 @@ import com.learning.project.dto.QuestionDTO;
 import com.learning.project.mapper.QuestionMapper;
 import com.learning.project.mapper.UserMapper;
 import com.learning.project.model.Question;
+import com.learning.project.model.QuestionExample;
 import com.learning.project.model.User;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,8 @@ public class QuestionService {
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalPage;//最后一页
 
-        Integer totalCount = questionMapper.count();//查总页数
+        // Integer totalCount = questionMapper.count();//查总页数
+        Integer totalCount = (int) questionMapper.countByExample(new QuestionExample());
         if (totalCount % size == 0) {
             totalPage = totalCount / size;
         } else {
@@ -46,11 +49,13 @@ public class QuestionService {
         //5*(i-1),size*(page-1)
         Integer offset = size * (page - 1);
         //每一页的列表
-        List<Question> questions = questionMapper.list(offset, size);
+        //  List<Question> questions = questionMapper.list(offset, size);
+        List<Question> questions = questionMapper.selectByExampleWithRowbounds(new QuestionExample(), new RowBounds(offset, size));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
 
         for (Question question : questions) {
-            User user = userMapper.findById(question.getCreator());
+            //User user = userMapper.findById(question.getCreator());
+            User user = userMapper.selectByPrimaryKey(question.getCreator());
             QuestionDTO questionDTO = new QuestionDTO();
             //将question对象中属性全部copy给questionDTO对象
             BeanUtils.copyProperties(question, questionDTO);
@@ -66,7 +71,10 @@ public class QuestionService {
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalPage;//最后一页
 
-        Integer totalCount = questionMapper.countByUserId(userId);//查总页数
+        //   Integer totalCount = questionMapper.countByUserId(userId);//查总页数
+        QuestionExample questionExample = new QuestionExample();
+        questionExample.createCriteria().andCreatorEqualTo(userId);
+        Integer totalCount = (int) questionMapper.countByExample(questionExample);
         if (totalCount % size == 0) {
             totalPage = totalCount / size;
         } else {
@@ -83,10 +91,15 @@ public class QuestionService {
         //5*(i-1),size*(page-1)
         Integer offset = size * (page - 1);
         //每一页的列表
-        List<Question> questions = questionMapper.listByUserId(userId, offset, size);
+        //List<Question> questions = questionMapper.listByUserId(userId, offset, size);
+
+        QuestionExample example = new QuestionExample();
+        example.createCriteria().andCreatorEqualTo(userId);
+        List<Question> questions = questionMapper.selectByExampleWithRowbounds(example, new RowBounds(offset, size));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
         for (Question question : questions) {
-            User user = userMapper.findById(question.getCreator());
+            // User user = userMapper.findById(question.getCreator());
+            User user = userMapper.selectByPrimaryKey(question.getCreator());
             QuestionDTO questionDTO = new QuestionDTO();
             //将question对象中属性全部copy给questionDTO对象
             BeanUtils.copyProperties(question, questionDTO);
@@ -102,8 +115,23 @@ public class QuestionService {
         Question question = questionMapper.getById(id);
         QuestionDTO questionDTO = new QuestionDTO();
         BeanUtils.copyProperties(question, questionDTO);
-        User user = userMapper.findById(question.getCreator());
+        // User user = userMapper.findById(question.getCreator());
+        User user = userMapper.selectByPrimaryKey(question.getCreator());
         questionDTO.setUser(user);
         return questionDTO;
+    }
+
+    public void createOrUpdate(Question question) {
+        if (question.getId() == null) {
+            //创建
+            question.setGmtCreate(System.currentTimeMillis());
+            question.setGmtModified(question.getGmtCreate());
+            questionMapper.create(question);
+        } else {
+            //更新
+            question.setGmtModified(question.getGmtCreate());
+            questionMapper.update(question);
+        }
+
     }
 }

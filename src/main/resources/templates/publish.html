@@ -3,13 +3,13 @@
 <head>
     <title>发布 - Community</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link rel="stylesheet" href="css/bootstrap.min.css"/><!--引入css-->
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="css/community.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/><!--引入css-->
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/community.min.css">
     <!-- <link rel="stylesheet" href="css/community.css">-->
     <!--<link rel="icon" href="/images/logo.png" type="image/x-icon"/>-->
-    <script src="js/jquery-3.4.1.min.js"></script>
-    <script src="js/bootstrap.min.js" type="application/javascript"></script>
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script src="/js/bootstrap.min.js" type="application/javascript"></script>
     <!--    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">-->
 </head>
 <body>
@@ -20,7 +20,7 @@
             <h2><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 发起</h2>
             <hr>
             <form action="/publish" method="post">
-                <input type="hidden" name="id" th:value="${id}">
+                <input type="hidden" name="id" th:value="${id}"><!--传递过来-->
                 <div class="form-group">
                     <label for="title">问题标题（简单扼要）:</label>
                     <input type="text" class="form-control" th:value="${title}" id="title" name="title"
