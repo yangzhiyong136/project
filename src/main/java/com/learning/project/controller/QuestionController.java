@@ -18,9 +18,11 @@ public class QuestionController {
     private QuestionService questionService;
 
     @GetMapping("/question/{id}")
-    public String Question(@PathVariable(name = "id") Integer id,
+    public String Question(@PathVariable(name = "id") Long id,
                            Model model) {
         QuestionDTO questionDTO = questionService.getById(id);//数据库查询，有就写回前端
+        //实现阅读数累增
+        questionService.incView(id);
         model.addAttribute("question",questionDTO);
         return "question";
     }

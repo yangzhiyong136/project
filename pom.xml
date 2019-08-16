@@ -64,13 +64,13 @@
             <version>2.0.1</version>
         </dependency>
 
-        <!--热部署，可以高效处理，项目服务问题，改什么都可以重启，但是我没配置-->
-     <!--   <dependency>
+        <!--热部署，可以高效处理，项目服务问题，改什么按Build Project 就可以重启，快速-->
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
-        </dependency>-->
-
+        </dependency>
+-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

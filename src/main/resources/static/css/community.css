@@ -34,3 +34,7 @@ body {
     font-size: 13px;
     margin-bottom: 15px;
 }
+
+.jumbotron {
+    margin: 50px;
+}

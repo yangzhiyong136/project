@@ -5,7 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.learning.project.mapper")//扫描
+//扫描
+@MapperScan("com.learning.project.mapper")
 public class LearnCommunityApplication {
 
     public static void main(String[] args) {

@@ -2,6 +2,9 @@ package com.learning.project.service;
 
 import com.learning.project.dto.PaginationDTO;
 import com.learning.project.dto.QuestionDTO;
+import com.learning.project.exception.CustomizeErrorCode;
+import com.learning.project.exception.CustomizeException;
+import com.learning.project.mapper.QuestionExtMapper;
 import com.learning.project.mapper.QuestionMapper;
 import com.learning.project.mapper.UserMapper;
 import com.learning.project.model.Question;
@@ -24,6 +27,8 @@ import java.util.List;
 public class QuestionService {
     @Autowired
     private QuestionMapper questionMapper;
+    @Autowired
+    private QuestionExtMapper questionExtMapper;
     @Autowired
     private UserMapper userMapper;
 
@@ -67,7 +72,7 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public PaginationDTO list(Integer userId, Integer page, Integer size) {
+    public PaginationDTO list(Long userId, Integer page, Integer size) {
         PaginationDTO paginationDTO = new PaginationDTO();
         Integer totalPage;//最后一页
 
@@ -111,8 +116,11 @@ public class QuestionService {
         return paginationDTO;
     }
 
-    public QuestionDTO getById(Integer id) {
-        Question question = questionMapper.getById(id);
+    public QuestionDTO getById(Long id) {
+        //Question question = questionMapper.getById(id);
+        Question question = questionMapper.selectByPrimaryKey(id);
+        if (question == null) {
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);        }
         QuestionDTO questionDTO = new QuestionDTO();
         BeanUtils.copyProperties(question, questionDTO);
         // User user = userMapper.findById(question.getCreator());
@@ -126,12 +134,45 @@ public class QuestionService {
             //创建
             question.setGmtCreate(System.currentTimeMillis());
             question.setGmtModified(question.getGmtCreate());
-            questionMapper.create(question);
+            // questionMapper.create(question);
+            question.setViewCount(0);
+            question.setLikeCount(0);
+            question.setCommentCount(0);
+            questionMapper.insert(question);
         } else {
             //更新
             question.setGmtModified(question.getGmtCreate());
-            questionMapper.update(question);
+            //questionMapper.update(question);
+            Question updateQuestion = new Question();
+            updateQuestion.setGmtModified(System.currentTimeMillis());
+            updateQuestion.setTitle(question.getTitle());
+            updateQuestion.setDescription(question.getDescription());
+            updateQuestion.setTag(question.getTag());
+            QuestionExample example = new QuestionExample();
+            //根据id跟新
+            example.createCriteria().andIdEqualTo(question.getId());
+            int updated = questionMapper.updateByExampleSelective(updateQuestion, example);
+            if (updated != 1) {
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
         }
 
     }
+
+    //实现阅读数累增
+    public void incView(Long id) {
+      /* Question question =  questionMapper.selectByPrimaryKey(id);
+        Question updateQuestion = new Question();
+        updateQuestion.setViewCount(question.getViewCount()+1);
+        QuestionExample  questionExample = new QuestionExample();
+        questionExample.createCriteria().andIdEqualTo(id);
+        questionMapper.updateByExampleSelective(updateQuestion, questionExample);*/
+      //这个扩展Mapper 考虑了并发问题，注释了的是没有考虑的
+      Question question = new Question();
+      question.setId(id);
+      question.setViewCount(1);
+      questionExtMapper.incView(question);
+
+    }
+
 }
