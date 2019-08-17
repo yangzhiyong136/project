@@ -8,10 +8,19 @@
     <link rel="stylesheet" href="css/community.min.css">
     <!-- <link rel="stylesheet" href="css/community.css">-->
     <!--<link rel="icon" href="/images/logo.png" type="image/x-icon"/>-->
-     <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/jquery-3.4.1.min.js"></script>
     <script src="js/bootstrap.min.js" type="application/javascript"></script>
     <!--    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">-->
 </head>
+<script type="application/javascript">
+    window.onload = function () {
+        var closable = window.localStorage.getItem("closable");
+        if (closable == "true") {
+            window.close();
+            window.localStorage.removeItem("closable");
+        }
+    }
+</script>
 <body>
 <div th:insert="navigation :: nav"></div>
 <div class="container-fluid main">
@@ -19,7 +28,8 @@
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
             <h2><span class="glyphicon glyphicon-list" aria-hidden="true"></span> 发现</h2>
             <hr>
-            <div class="media" th:each="question : ${pagination.questions}"><!--th:each="question : ${pagination.data}"-->
+            <div class="media" th:each="question : ${pagination.questions}">
+                <!--th:each="question : ${pagination.data}"-->
                 <div class="media-left">
                     <a href="#">
                         <!--获取数据库图片要这样拿-->
@@ -29,7 +39,7 @@
                 </div>
                 <div class="media-body">
                     <h4 class="media-heading">
-                      <a th:href="@{'/question/'+ ${question.id}}" th:text="${question.title}"></a>
+                        <a th:href="@{'/question/'+ ${question.id}}" th:text="${question.title}"></a>
                     </h4>
                     <span th:text="${question.description}"></span><br>
                     <span class="text-desc">
