@@ -2,25 +2,27 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${question.title}"></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <!--二级目录，样式和根目录要一致，所以最前面要多加一个"/"-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/css/community.min.css">
-    <!-- <link rel="stylesheet" href="css/community.css">-->
-    <!--<link rel="icon" href="/images/logo.png" type="image/x-icon"/>-->
+    <!-- <link rel="icon" href="/images/logo.png" type="image/x-icon"/>-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="stylesheet" href="/css/editormd.preview.min.css">
     <script src="/js/jquery-3.4.1.min.js"></script>
     <script src="/js/bootstrap.min.js" type="application/javascript"></script>
+    <script src="/js/moment.js" type="application/javascript"></script>
     <script src="/js/community.js" type="application/javascript"></script>
     <script src="/js/editormd.min.js" type="application/javascript"></script>
-    <script src="/js/moment.js" type="application/javascript"></script>
-    <!--    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">-->
+    <script src="/js/lib/marked.min.js"></script>
+    <script src="/js/lib/prettify.min.js"></script>
 </head>
 <body>
-<div th:insert="navigation :: nav"></div>
+<div th:insert="~{navigation :: nav}"></div>
 <div class="container-fluid main profile">
     <div class="row">
+
         <!--左边主要内容-->
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
             <!--正文-->
@@ -135,15 +137,16 @@
             </div>
 
         </div>
+
+        <!--右边信息块-->
         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <h4>发起人</h4>
-                <div class="media"><!--th:each="question : ${pagination.data}"-->
+                <div class="media">
                     <div class="media-left">
                         <a href="#">
-                            <!--获取数据库图片要这样拿-->
-                            <img class="media-object img-circle"
-                                 th:src="@{${question.user.avatarUrl}}">
+                            <img class="media-object img-rounded"
+                                 th:src="${question.user.avatarUrl}">
                         </a>
                     </div>
                     <div class="media-body">
@@ -153,14 +156,27 @@
                     </div>
                 </div>
             </div>
+
+            <!--微信号-->
+            <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <h4>官方微信</h4>
+                <img class="img-thumbnail question-wechat" src="/images/official.jpg">
+            </div>
+
+            <!--相关问题-->
             <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <h4>相关问题</h4>
+                <ul class="question-related">
+                    <li th:each="related : ${relatedQuestions}">
+                        <a th:href="@{'/question/'+ ${related.id}}" th:text="${related.title}"></a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
+<div th:insert="~{footer :: foot}"></div>
 </body>
 </html>
-
-

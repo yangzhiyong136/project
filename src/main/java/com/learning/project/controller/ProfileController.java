@@ -2,6 +2,7 @@ package com.learning.project.controller;
 
 import com.learning.project.dto.PaginationDTO;
 import com.learning.project.model.User;
+import com.learning.project.service.NotificationService;
 import com.learning.project.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,8 @@ public class ProfileController {
 
     @Autowired
     private QuestionService questionService;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/profile/{action}")//动态响应
     public String profile(HttpServletRequest request,
@@ -31,21 +34,7 @@ public class ProfileController {
                           @RequestParam(name = "page", defaultValue = "1") Integer page,
                           @RequestParam(name = "size", defaultValue = "5") Integer size) {
         User user = (User) request.getSession().getAttribute("user");
-      //  User user = null;
-     /*   Cookie[] cookies = request.getCookies();//获取cookie中的token，判断是否登录
-        if (cookies != null && cookies.length != 0) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("token")) {
-                    String token = cookie.getValue();
-                    user = userMapper.findByToken(token);//在数据库中寻找
-                    if (user != null) {//获取用户信息不为空
-                        request.getSession().setAttribute("user", user);//把封装好的对象，传到前端
-                    }
-                    break;
-                }
 
-            }
-        }*/
 
         if (user == null) {
             return "redirect:/";
@@ -54,13 +43,15 @@ public class ProfileController {
         if ("questions".equals(action)) {
             model.addAttribute("section", "questions");
             model.addAttribute("sectionName", "我的提问");
+            //page，inset，user
+            PaginationDTO paginationDTO = questionService.list(user.getId(), page, size);
+            model.addAttribute("pagination", paginationDTO);//把封装好的对象，传到前端
         } else if ("replies".equals(action)) {
+            PaginationDTO paginationDTO = notificationService.list(user.getId(), page, size);
             model.addAttribute("section", "replies");
+            model.addAttribute("pagination", paginationDTO);//把封装好的对象，传到前端
             model.addAttribute("sectionName", "最新回复");
         }
-        //page，inset，user
-        PaginationDTO paginationDTO = questionService.list(user.getId(), page, size);
-        model.addAttribute("pagination", paginationDTO);//把封装好的对象，传到前端
 
         return "profile";
     }

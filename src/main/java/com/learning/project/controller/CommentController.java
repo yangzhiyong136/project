@@ -40,7 +40,7 @@ public class CommentController {
         if (user == null) {
             return ResultDTO.errorOf(CustomizeErrorCode.NOT_LOGIN);
         }
-        if(commentCreateDTO == null || StringUtils.isBlank(commentCreateDTO.getContent())){
+        if (commentCreateDTO == null || StringUtils.isBlank(commentCreateDTO.getContent())) {
             return ResultDTO.errorOf(CustomizeErrorCode.COMMENT_IS_EMPTY);
         }
 
@@ -50,19 +50,20 @@ public class CommentController {
         comment.setType(commentCreateDTO.getType());
         comment.setGmtModified(System.currentTimeMillis());
         comment.setGmtCreate(System.currentTimeMillis());
-        comment.setCommentator(1L);
+        comment.setCommentator(user.getId());
+        comment.setCommentCount(0L);
         comment.setLikeCount(0L);
         //  commentMapper.insert(comment);//插入数据库
         //  如果一个属性值要加判断，抽出Service层，业务逻辑层，加以判断再调用
-        commentService.insert(comment);//插入数据库
+        commentService.insert(comment, user);//插入数据库
         return ResultDTO.okOf();
     }
 
 
     @ResponseBody//自动数列化json，返回给前端
     @RequestMapping(value = "/comment/{id}", method = RequestMethod.GET)
-    public ResultDTO<List> comments(@PathVariable(name ="id") Long id){
-        List<CommentDTO> commentDTOS = commentService.listByTargetId(id, CommentTypeEnum.QUESTION);
+    public ResultDTO<List<CommentDTO>> comments(@PathVariable(name = "id") Long id) {
+        List<CommentDTO> commentDTOS = commentService.listByTargetId(id, CommentTypeEnum.COMMENT);
         return ResultDTO.okOf(commentDTOS);
     }
 }

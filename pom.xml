@@ -84,6 +84,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--云存储-->
+        <dependency>
+            <groupId>cn.ucloud.ufile</groupId>
+            <artifactId>ufile-client-java</artifactId>
+            <version>2.1.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

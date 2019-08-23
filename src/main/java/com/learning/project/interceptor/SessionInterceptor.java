@@ -3,6 +3,7 @@ package com.learning.project.interceptor;
 import com.learning.project.mapper.UserMapper;
 import com.learning.project.model.User;
 import com.learning.project.model.UserExample;
+import com.learning.project.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,8 @@ public class SessionInterceptor implements HandlerInterceptor {
 
     @Autowired
     private UserMapper userMapper;
-   /* @Autowired
-    private NotificationService notificationService;*/
+    @Autowired
+    private NotificationService notificationService;
 
     // @Value("${github.redirect.uri}")
     //  private String redirectUri;
@@ -48,29 +49,14 @@ public class SessionInterceptor implements HandlerInterceptor {
                    /* if (user != null) {//获取用户信息不为空
                         request.getSession().setAttribute("user", user);//把封装好的对象，传到前端
                     }*/
-                    if (users.size() != 0){
-                        request.getSession().setAttribute("user", users.get(0));//把封装好的对象，传到前端
-                    }
-                        break;
-                }
-            }
-        /*Cookie[] cookies = request.getCookies();
-        if (cookies != null && cookies.length != 0)
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("token")) {
-                    String token = cookie.getValue();
-                    UserExample userExample = new UserExample();
-                    userExample.createCriteria()
-                            .andTokenEqualTo(token);
-                    List<User> users = userMapper.selectByExample(userExample);
                     if (users.size() != 0) {
                         request.getSession().setAttribute("user", users.get(0));
                         Long unreadCount = notificationService.unreadCount(users.get(0).getId());
                         request.getSession().setAttribute("unreadCount", unreadCount);
                     }
-                    break;
+                        break;
                 }
-            }*/
+            }
         return true;
     }
 

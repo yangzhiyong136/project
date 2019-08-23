@@ -59,25 +59,3 @@ public class CustomizeExceptionHandler {
 
     }
 }
- /*String contentType = request.getContentType();
-        if ("application/json".equals(contentType)) {
-            ResultDTO resultDTO;
-            // 返回 JSON
-            if (e instanceof CustomizeException) {
-              resultDTO = ResultDTO.errorOf((CustomizeException) e);
-            } else {
-                log.error("handle error", e);
-               resultDTO = ResultDTO.errorOf(ICustomizeErrorCode.SYS_ERROR);
-            }
-            try {
-                response.setContentType("application/json");
-                response.setStatus(200);
-                response.setCharacterEncoding("utf-8");
-                PrintWriter writer = response.getWriter();
-                writer.write(JSON.toJSONString(resultDTO));
-                writer.close();
-            } catch (IOException ioe) {
-            }
-            return null;
-        } else {*/
-

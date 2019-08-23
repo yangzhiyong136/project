@@ -2,6 +2,8 @@ package com.learning.project.service;
 
 import com.learning.project.dto.CommentDTO;
 import com.learning.project.enums.CommentTypeEnum;
+import com.learning.project.enums.NotificationStatusEnum;
+import com.learning.project.enums.NotificationTypeEnum;
 import com.learning.project.exception.CustomizeErrorCode;
 import com.learning.project.exception.CustomizeException;
 import com.learning.project.mapper.*;
@@ -25,17 +27,24 @@ import java.util.stream.Collectors;
 public class CommentService {
     @Autowired
     private CommentMapper commentMapper;
+
     @Autowired
     private QuestionMapper questionMapper;
+
     @Autowired
     private QuestionExtMapper questionExtMapper;
+
     @Autowired
     private UserMapper userMapper;
+
     @Autowired
     private CommentExtMapper commentExtMapper;
 
+    @Autowired
+    private NotificationMapper notificationMapper;
+
     @Transactional
-    public void insert(Comment comment) {
+    public void insert(Comment comment, User commentator) {
         if (comment.getParentId() == null || comment.getParentId() == 0) {
             throw new CustomizeException(CustomizeErrorCode.TARGET_PARAM_NOT_FOUND);
         }
@@ -44,30 +53,61 @@ public class CommentService {
         }
         if (comment.getType() == CommentTypeEnum.COMMENT.getType()) {
             //回复评论
-            Comment dbComment = commentMapper.selectByPrimaryKey(comment.getId());
+            Comment dbComment = commentMapper.selectByPrimaryKey(comment.getParentId());
             if (dbComment == null) {
                 throw new CustomizeException(CustomizeErrorCode.COMMENT_NOT_FOUND);
+            }
+
+            //回复问题，验证
+            Question question = questionMapper.selectByPrimaryKey(dbComment.getParentId());
+            if (question == null) {
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
             commentMapper.insert(comment);
             //增加评论数
             Comment parentComment = new Comment();
             parentComment.setId(comment.getParentId());
             parentComment.setCommentCount(1L);
-            commentExtMapper.inCommentCount(comment);
+            commentExtMapper.incCommentCount(parentComment);
+
+            //创建通知
+            createNotify(comment, dbComment.getCommentator(), commentator.getName(), question.getTitle(), NotificationTypeEnum.REPLY_COMMENT, question.getId());
 
         } else {
             //回复问题
-            Question question = questionMapper.selectByPrimaryKey(comment.getId());
+            Question question = questionMapper.selectByPrimaryKey(comment.getParentId());
             if (question == null) {
                 throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
             }
+            //  comment.setCommentCount(0L);//如果有问题就改回来
             commentMapper.insert(comment);
-            question.setCommentCount(1);
-            questionExtMapper.inCommentCount(question);
+            question.setCommentCount(0);
+            questionExtMapper.incCommentCount(question);
+            //创建通知
+            createNotify(comment, question.getCreator(), commentator.getName(), question.getTitle(), NotificationTypeEnum.REPLY_QUESTION, question.getId());
         }
     }
 
+    //代码重构
+    private void createNotify(Comment comment, Long receiver, String notifierName, String outerTitle, NotificationTypeEnum notificationType, Long outerId) {
+        if (receiver == comment.getCommentator()) {
+            //创建和评论都是同一个人，不需要通知
+            return;
+        }
+        Notification notification = new Notification();
+        notification.setGmtCreate(System.currentTimeMillis());
+        notification.setType(notificationType.getType());
+        notification.setOuterid(outerId);
+        notification.setNotifier(comment.getCommentator());
+        notification.setStatus(NotificationStatusEnum.UNREAD.getStatus());
+        notification.setReceiver(receiver);
+        notification.setNotifierName(notifierName);
+        notification.setOuterTitle(outerTitle);
+        notificationMapper.insert(notification);
+    }
+
     public List<CommentDTO> listByTargetId(Long id, CommentTypeEnum type) {
+
         CommentExample commentExample = new CommentExample();
         commentExample.createCriteria().andParentIdEqualTo(id).andTypeEqualTo(type.getType());//内层修复
         commentExample.setOrderByClause("gmt_create desc");//数据语句排序

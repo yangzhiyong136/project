@@ -1,9 +1,11 @@
 package com.learning.project.controller;
 
+import com.learning.project.cache.TagCache;
 import com.learning.project.dto.QuestionDTO;
 import com.learning.project.model.Question;
 import com.learning.project.model.User;
 import com.learning.project.service.QuestionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,9 +22,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 public class PublishController {
-  /*  @Autowired
-    private QuestionMapper questionMapper;*/
-  //Service层封装Mapper层
+    /*  @Autowired
+      private QuestionMapper questionMapper;*/
+    //Service层封装Mapper层
     @Autowired
     private QuestionService questionService;
    /* @Autowired
@@ -35,13 +37,18 @@ public class PublishController {
         model.addAttribute("title", question.getTitle());
         model.addAttribute("description", question.getDescription());
         model.addAttribute("tag", question.getTag());
-        model.addAttribute("id",question.getId());//获取唯一标识，页面
+        model.addAttribute("id", question.getId());//获取唯一标识，页面
+
+        model.addAttribute("tags", TagCache.get());//标签获取，放到前端
+
         return "publish";
     }
 
 
     @GetMapping("/publish")
-    public String publish() {
+    public String publish(Model model) {
+        model.addAttribute("tags", TagCache.get());//标签获取，放到前端
+
         return "publish";
     }
 
@@ -60,6 +67,8 @@ public class PublishController {
         model.addAttribute("title", title);
         model.addAttribute("description", description);
         model.addAttribute("tag", tag);
+        model.addAttribute("tags", TagCache.get());//标签获取，放到前端
+
         if (title == null || title == "") {
             model.addAttribute("error", "标题不能为空");
             return "publish";
@@ -70,6 +79,12 @@ public class PublishController {
         }
         if (tag == null || tag == "") {
             model.addAttribute("error", "标签不能为空");
+            return "publish";
+        }
+
+        String invalid = TagCache.filterInvalid(tag);
+        if (StringUtils.isNotBlank(invalid)) {
+            model.addAttribute("error", "输入非法标签" + invalid);
             return "publish";
         }
        /* User user = null;
@@ -105,7 +120,7 @@ public class PublishController {
         question.setGmtModified(question.getGmtCreate());*/
         question.setId(id);
         questionService.createOrUpdate(question);
-       // questionMapper.create(question);
+        // questionMapper.create(question);
         return "redirect:/";
     }
 }

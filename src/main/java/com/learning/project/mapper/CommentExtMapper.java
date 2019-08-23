@@ -4,5 +4,5 @@ import com.learning.project.model.Comment;
 
 public interface CommentExtMapper {
 
-    int inCommentCount(Comment comment);
+    int incCommentCount(Comment comment);
 }

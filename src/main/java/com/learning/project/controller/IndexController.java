@@ -24,7 +24,8 @@ public class IndexController {
     public String index(Model model,
                         //分页功能
                         @RequestParam(name = "page", defaultValue = "1") Integer page,
-                        @RequestParam(name = "size", defaultValue = "5") Integer size
+                        @RequestParam(name = "size", defaultValue = "5") Integer size,
+                        @RequestParam(name = "search", required = false) String search
 
     ) {
        /* Cookie[] cookies = request.getCookies();//获取cookie中的token，判断是否登录
@@ -40,8 +41,9 @@ public class IndexController {
                 }
 
             }*/
-        PaginationDTO pagination = questionService.list(page, size);//还有封装了QuestionService里的信息
+        PaginationDTO pagination = questionService.list(search,page, size);//还有封装了QuestionService里的信息
         model.addAttribute("pagination", pagination);//把封装好的对象，传到前端
+       model.addAttribute("search",search);
         return "index";
     }
 
